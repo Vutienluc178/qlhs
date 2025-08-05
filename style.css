@@ -1,5 +1,4 @@
 <!-- CSS_student.html -->
-<style>
 :root {
   /* Color Palette - Education Theme */
   --primary-color: #4f8cff;
@@ -341,4 +340,4 @@ body {
   .overview-stats { grid-template-columns: 1fr;}
 }
 
-</style>
+
