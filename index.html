@@ -156,6 +156,11 @@
         </div>
 
         <!-- Students Page -->
+        <button class="btn btn-outline" id="importExcelBtn" style="margin-left:1rem;">
+    <i class="fas fa-file-excel"></i> Nhập từ Excel
+</button>
+<input type="file" id="excelInput" accept=".xlsx,.xls,.csv" style="display:none;">
+
         <div class="page" id="studentsPage">
             <div class="page-header">
                 <h2><i class="fas fa-list"></i> Danh sách học sinh</h2>
@@ -249,6 +254,9 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Kết nối file JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
    <script src="app.js"></script>
 </body>
 </html>
+
