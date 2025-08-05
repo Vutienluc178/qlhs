@@ -640,4 +640,55 @@ document.getElementById('excelInput').addEventListener('change', function(e) {
 
 // ==== End JS ====
 
+// ==== LOGIN SYSTEM ====
+// Đặt tài khoản/mật khẩu cứng ở đây (có thể thêm nhiều tài khoản)
+const USERS = [
+    {user: "giaovien", pass: "123456", name: "Thầy Tiến Lực"},
+    {user: "admin", pass: "admin123", name: "Quản trị viên"}
+];
+// Hàm kiểm tra đăng nhập
+function showLogin(show=true) {
+    document.getElementById('loginOverlay').style.display = show ? 'flex' : 'none';
+    document.body.style.overflow = show ? "hidden" : "";
+    // Ẩn app khi chưa login
+    document.querySelector('.header').style.display = show ? 'none' : '';
+    document.getElementById('sidebar').style.display = show ? 'none' : '';
+    document.getElementById('mainContent').style.display = show ? 'none' : '';
+    document.getElementById('logoutBtn').style.display = show ? 'none' : '';
+}
+function checkLoginState() {
+    if(localStorage.getItem('loggedUser')) {
+        showLogin(false);
+        let info = JSON.parse(localStorage.getItem('loggedUser'));
+        currentUser.name = info.name;
+        document.getElementById('currentUser').textContent = info.name;
+    } else {
+        showLogin(true);
+    }
+}
+// Xử lý submit form đăng nhập
+document.getElementById('loginForm').onsubmit = function(e) {
+    e.preventDefault();
+    let user = document.getElementById('loginUser').value.trim();
+    let pass = document.getElementById('loginPass').value;
+    let found = USERS.find(u=>u.user===user && u.pass===pass);
+    if(found) {
+        localStorage.setItem('loggedUser', JSON.stringify(found));
+        currentUser.name = found.name;
+        showLogin(false);
+        document.getElementById('currentUser').textContent = found.name;
+        document.getElementById('loginError').textContent = "";
+        reloadPage(); // Load lại app sau đăng nhập
+    } else {
+        document.getElementById('loginError').textContent = "Sai tài khoản hoặc mật khẩu!";
+    }
+};
+// Đăng xuất
+document.getElementById('logoutBtn').onclick = function() {
+    localStorage.removeItem('loggedUser');
+    showLogin(true);
+};
+// Tự động kiểm tra khi vào trang
+window.addEventListener('DOMContentLoaded', checkLoginState);
+
 
