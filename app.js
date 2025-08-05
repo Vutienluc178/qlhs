@@ -690,5 +690,40 @@ document.getElementById('logoutBtn').onclick = function() {
 };
 // Tự động kiểm tra khi vào trang
 window.addEventListener('DOMContentLoaded', checkLoginState);
+// ==== EXPORT MONTHLY REPORT ====
+document.getElementById('exportMonthlyBtn').addEventListener('click', function() {
+    // Lấy tháng/năm đang chọn trên trang Thống kê
+    let month = parseInt(document.getElementById('statsMonth').value);
+    let year = parseInt(document.getElementById('statsYear').value);
+
+    // Lọc danh sách học sinh theo lớp nếu cần (ở đây xuất tất cả)
+    let filtered = students; // hoặc lọc theo class
+
+    // Chuẩn bị dữ liệu báo cáo
+    let report = [
+        ["MÃ HS","HỌ VÀ TÊN","LỚP","ĐTB tháng","Số lượt học tập","Số vi phạm","Số khen thưởng"]
+    ];
+    for (let s of filtered) {
+        let diaries = (diaryData[s.id]||[]).filter(r=>isInMonthYear(r.date,month,year));
+        let avg = diaries.length? (diaries.map(x=>x.score).reduce((a,b)=>a+b,0)/diaries.length).toFixed(2) : '';
+        let dis = (disciplineData[s.id]||[]).filter(r=>isInMonthYear(r.date,month,year));
+        let viPham = dis.filter(x=>x.type==='Vi phạm').length;
+        let khenThuong = dis.filter(x=>x.type==='Khen thưởng').length;
+
+        report.push([
+            s.code, s.name, s.class, avg, diaries.length, viPham, khenThuong
+        ]);
+    }
+
+    // Xuất ra file Excel
+    let ws = XLSX.utils.aoa_to_sheet(report);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "BaoCaoThang");
+    let fileName = `BaoCaoThang_${month}_${year}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+
+    showToast("Đã xuất báo cáo tổng kết tháng!", "success");
+});
+
 
 
