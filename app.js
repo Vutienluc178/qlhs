@@ -560,6 +560,84 @@ function updateAllClassFilters() {
         if (el) { el.innerHTML = opts; }
     });
 }
+// ===== IMPORT HỌC SINH TỪ EXCEL =====
+document.getElementById('importExcelBtn').addEventListener('click', function() {
+    document.getElementById('excelInput').click();
+});
+
+document.getElementById('excelInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        let data = evt.target.result;
+        let workbook;
+        if (file.name.endsWith('.csv')) {
+            // Đọc file CSV
+            let lines = data.split(/\r?\n/).filter(Boolean);
+            let headers = lines[0].split(',').map(h=>h.trim().toLowerCase());
+            let codeIdx = headers.indexOf('mã hs');
+            let nameIdx = headers.indexOf('họ và tên');
+            let classIdx = headers.indexOf('lớp');
+            let dobIdx = headers.indexOf('ngày sinh');
+            if (codeIdx<0 || nameIdx<0 || classIdx<0 || dobIdx<0) {
+                showToast("File CSV thiếu cột!", "error");
+                return;
+            }
+            for (let i=1; i<lines.length; i++) {
+                let cols = lines[i].split(',');
+                if (cols.length < 4) continue;
+                students.push({
+                    id: cols[codeIdx] || randomId(),
+                    code: cols[codeIdx],
+                    name: cols[nameIdx],
+                    class: cols[classIdx],
+                    dob: cols[dobIdx]
+                });
+            }
+            saveAllData();
+            renderStudentList();
+            updateAllClassFilters();
+            showToast("Đã nhập danh sách từ file CSV!", "success");
+        } else {
+            // Đọc file Excel
+            workbook = XLSX.read(data, {type: 'binary'});
+            let sheet = workbook.Sheets[workbook.SheetNames[0]];
+            let json = XLSX.utils.sheet_to_json(sheet, {header:1});
+            // Xác định vị trí các cột theo dòng đầu
+            let headers = json[0].map(h=>h.toString().toLowerCase());
+            let codeIdx = headers.indexOf('mã hs');
+            let nameIdx = headers.indexOf('họ và tên');
+            let classIdx = headers.indexOf('lớp');
+            let dobIdx = headers.indexOf('ngày sinh');
+            if (codeIdx<0 || nameIdx<0 || classIdx<0 || dobIdx<0) {
+                showToast("File Excel thiếu cột!", "error");
+                return;
+            }
+            for (let i=1; i<json.length; i++) {
+                let row = json[i];
+                if (!row[codeIdx] || !row[nameIdx] || !row[classIdx] || !row[dobIdx]) continue;
+                students.push({
+                    id: row[codeIdx] || randomId(),
+                    code: row[codeIdx],
+                    name: row[nameIdx],
+                    class: row[classIdx],
+                    dob: row[dobIdx]
+                });
+            }
+            saveAllData();
+            renderStudentList();
+            updateAllClassFilters();
+            showToast("Đã nhập danh sách từ file Excel!", "success");
+        }
+    };
+    if (file.name.endsWith('.csv')) {
+        reader.readAsText(file, 'UTF-8');
+    } else {
+        reader.readAsBinaryString(file);
+    }
+});
 
 // ==== End JS ====
+
 
