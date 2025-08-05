@@ -1,5 +1,4 @@
 <!-- JavaScript_student.html -->
-<script>
 // Data demo: lưu local, bạn có thể tích hợp backend sau
 let students = [];
 let diaryData = {};    // { studentId: [{date, subject, score, note}], ... }
@@ -563,4 +562,4 @@ function updateAllClassFilters() {
 }
 
 // ==== End JS ====
-</script>
+
